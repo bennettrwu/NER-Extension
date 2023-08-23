@@ -11,13 +11,11 @@ async function startNER() {
   await enableReader();
 
   const text_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-  const pages = document.body.getElementsByClassName('page');
-  for (const page of pages) {
-    for (const tag of text_tags) {
-      const text_element = page.getElementsByTagName(tag);
-      for (const element of text_element) {
-        await runNER(element);
-      }
+  const page = document.getElementById('ner-container');
+  for (const tag of text_tags) {
+    const text_element = page.getElementsByTagName(tag);
+    for (const element of text_element) {
+      await runNER(element);
     }
   }
 
@@ -57,7 +55,12 @@ async function enableReader() {
   const doc = new DOMParser().parseFromString(
     `
     <div id="ner-container">
-      ${article.content}
+      <div id="ner-content">
+        <h1>${article.title}</h1>
+        <p style="font-style: italic">${article.byline}</p>
+        <hr></hr>
+        ${article.content}
+      </div>
       <div id="ner-prompt">
         <p>Running Named Entity Recognition...</p>
         <p class="ner-loading"></p>
