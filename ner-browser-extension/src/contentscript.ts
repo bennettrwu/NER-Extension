@@ -5,12 +5,15 @@ const NER_URL = 'http://localhost:8080/ner';
 async function main() {
   await enableReader();
 
+  const text_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
   const pages = document.body.getElementsByClassName('page');
   for (const page of pages) {
-    const paragraphs = page.getElementsByTagName('p');
+    for (const tag of text_tags) {
+      const text_element = page.getElementsByTagName(tag);
 
-    for (const paragraph of paragraphs) {
-      await runNER(paragraph);
+      for (const element of text_element) {
+        await runNER(element);
+      }
     }
   }
 }
