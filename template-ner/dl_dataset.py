@@ -135,10 +135,22 @@ def genTemplates(sentence: list[str], ner_tags: list[str]):
 
 def getRandomNonEntity(sentence: list[str], ner_tags: list[str]):
     # Randomly generate numbers until index is not a named entity
-    i = random.randint(0, len(ner_tags) - 1)
-    while ner_tags[i] != 'O':
-        i = random.randint(0, len(ner_tags) - 1)
-    return sentence[i]
+    a = random.randint(0, len(ner_tags) - 1)
+    b = random.randint(a + 1, min(len(ner_tags), a + 5))
+    valid = True
+    for i in range(a, b):
+        if (ner_tags[i] != 'O'):
+            valid = False
+
+    while not valid:
+        a = random.randint(0, len(ner_tags) - 1)
+        b = random.randint(a, len(ner_tags))
+        valid = True
+        for i in range(a, b):
+            if (ner_tags[i] != 'O'):
+                valid = False
+
+    return ' '.join(sentence[a:b])
 
 
 main()
