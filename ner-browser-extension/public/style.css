@@ -1,4 +1,58 @@
-.page {
+#ner-prompt {
+  z-index: 1000;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+
+  border-radius: 0.25rem;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, .2);
+
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1.6em;
+}
+
+.ner-button {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1.2em;
+
+  border-style: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+}
+
+.ner-button:hover {
+  filter: brightness(1.1);
+}
+
+.ner-button:active {
+  filter: brightness(1.2);
+}
+
+.ner-loading {
+  display: inline-block;
+  margin: 0 auto;
+  width: 40px;
+  height: 40px;
+}
+
+.ner-loading:after {
+  content: " ";
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #000000;
+  border-color: #000000 transparent #000000 transparent;
+  animation: rotation 2s infinite linear;
+}
+
+
+#ner-container {
   display: flex;
   justify-content: center;
   font-family: Helvetica, Arial, sans-serif;
@@ -6,7 +60,7 @@
   line-height: 1.6em;
 }
 
-.page:first-child {
+.page {
   max-width: 700px;
   margin: 0 auto;
 }
@@ -80,4 +134,14 @@ figure {
 
 .Organization::before {
   content: 'Organization';
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
 }
