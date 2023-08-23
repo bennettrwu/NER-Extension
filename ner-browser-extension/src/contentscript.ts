@@ -39,12 +39,7 @@ async function runNER(e: Element) {
     body: text,
   });
 
-  const to_replace = [
-    { str: 'Flutter', n: 1, type: 'Miscellaneous' },
-    { str: 'iOS', n: 1, type: 'Location' },
-    { str: 'Engine', n: 1, type: 'Person' },
-    { str: 'Impeller', n: 1, type: 'Organization' },
-  ]; // (await res.json()) as Array<{ str: string; n: number; type: string }>;
+  const to_replace = (await res.json()) as Array<{ str: string; n: number; type: string }>;
 
   let updated_element = e.innerHTML;
   for (const { str, n, type } of to_replace) {

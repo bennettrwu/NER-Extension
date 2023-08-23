@@ -12,7 +12,13 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @cross_origin()
 def index():
     print(request.data.decode('utf-8'))
-    return 'Hello, World!'
+    return [
+        {'str': 'Flutter', 'n': 1, 'type': 'Miscellaneous'},
+        {'str': 'iOS', 'n': 1, 'type': 'Miscellaneous'},
+        {'str': 'Engine', 'n': 1, 'type': 'Miscellaneous'},
+        {'str': 'Impeller', 'n': 1, 'type': 'Miscellaneous'},
+    ]
+
 
 if __name__ == '__main__':
     from waitress import serve
