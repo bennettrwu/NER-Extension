@@ -144,7 +144,7 @@ def getRandomNonEntity(sentence: list[str], ner_tags: list[str]):
 
     while not valid:
         a = random.randint(0, len(ner_tags) - 1)
-        b = random.randint(a, len(ner_tags))
+        b = random.randint(a + 1, min(len(ner_tags), a + 5))
         valid = True
         for i in range(a, b):
             if (ner_tags[i] != 'O'):
