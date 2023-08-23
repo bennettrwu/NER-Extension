@@ -77,7 +77,7 @@ def parseDataset(dataset_dir: os.PathLike, split_name: str):
 
     # Save templates as csv
     pd.DataFrame({
-        'Soruce sentence': all_sentences,
+        'Source sentence': all_sentences,
         'Answer sentence': all_templates
     }).to_csv(os.path.join(dataset_dir, split_name + '.csv'), index=False)
 
