@@ -11,7 +11,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @app.route('/ner', methods=['POST'])
 @cross_origin()
 def index():
-    print(request.get_json())
+    print(request.data.decode('utf-8'))
     return 'Hello, World!'
 
 if __name__ == '__main__':

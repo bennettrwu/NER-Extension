@@ -2,29 +2,41 @@ import { Readability } from '@mozilla/readability';
 
 const NER_URL = 'http://localhost:8080/ner';
 
-function main() {
-  runNER();
+async function main() {
+  await enableReader();
+
+  const pages = document.body.getElementsByClassName('page');
+  for (const page of pages) {
+    const paragraphs = page.getElementsByTagName('p');
+
+    for (const paragraph of paragraphs) {
+      await runNER(paragraph);
+    }
+  }
 }
 
-async function runNER() {
+async function enableReader() {
   const documentClone = document.cloneNode(true);
   const reader = new Readability(documentClone as Document);
   const article = reader.parse();
-  console.log(document.documentElement.innerHTML);
+
+  const doc = new DOMParser().parseFromString(article.content, 'text/html').body;
+  document.body.replaceWith(doc);
+}
+
+async function runNER(e: Element) {
+  const text = e.textContent;
+  if (text === '') return;
 
   const res = await fetch(NER_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(article.textContent),
+    body: text,
   });
 
   console.log(await res.text());
-
-  // const doc = new DOMParser().parseFromString(article.content, 'text/html').body;
-
-  // document.body.replaceWith(doc);
 }
 
 main();
