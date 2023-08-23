@@ -22,3 +22,61 @@ h3 {
 figure {
   margin: 0.5em !important;
 }
+
+.named-entity {
+  position: relative;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.named-entity::before {
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+  border-style: solid;
+  border-width: 1px;
+  background-color: white;
+  display: none;
+
+  position: absolute;
+  bottom: calc(100% + 0.25rem);
+  left: 0px;
+
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.named-entity:hover::before {
+  display: block;
+}
+
+.Miscellaneous {
+  background-color: #E3B5C7;
+}
+
+.Miscellaneous::before {
+  content: 'Micsellaneous';
+}
+
+.Location {
+  background-color: #6DD3CE;
+}
+
+.Location::before {
+  content: 'Location';
+}
+
+.Person {
+  background-color: #C8E9A0;
+}
+
+.Person::before {
+  content: 'Person';
+}
+
+.Organization {
+  background-color: #F7A278;
+}
+
+.Organization::before {
+  content: 'Organization';
+}
