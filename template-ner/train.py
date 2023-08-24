@@ -3,10 +3,9 @@ import torch
 import random
 import numpy as np
 import pandas as pd
-from transformers import AdamW, BartConfig, BartForConditionalGeneration, BartTokenizer, get_linear_schedule_with_warmup
+from transformers import AdamW, BartForConditionalGeneration, BartTokenizer, get_linear_schedule_with_warmup
 from torch.utils.data import Dataset, DataLoader, RandomSampler, SequentialSampler
 from torch.cuda import amp
-from simpletransformers.config.model_args import Seq2SeqArgs
 from tqdm.auto import tqdm
 
 epochs = 20
@@ -29,9 +28,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # Load pretrained bart model and tokenizer
-print('Loading pretrained model...')
-model = BartForConditionalGeneration.from_pretrained('facebook/bart-large')
-tokenizer = BartTokenizer.from_pretrained('facebook/bart-large')
+model = 'facebook/bart-large'
+print(f'Loading {model} model...')
+model = BartForConditionalGeneration.from_pretrained(model)
+tokenizer = BartTokenizer.from_pretrained(model)
 model.to(device)
 print('Loaded!')
 
