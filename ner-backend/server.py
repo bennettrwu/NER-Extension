@@ -34,7 +34,7 @@ def find_replace_positions(tokens: list[str], labels: list[str]) -> list[dict]:
             entities.append({
                 'str': token,
                 'type': entity_map[label.split('-')[1]],
-                'n': word_counts[label]
+                'n': word_counts[token]
             })
 
     return entities
