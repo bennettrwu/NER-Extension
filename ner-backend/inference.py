@@ -26,8 +26,6 @@ tokenizer = BartTokenizer.from_pretrained(best_model_save_dir)
 model.to(device)
 print('Loaded!')
 
-test = 'AL-AIN, United Arab Emirates 1996-12-06.'
-
 
 def tokenize_paragraph(paragraph: str) -> list[str]:
     word_tokens = []
@@ -40,7 +38,7 @@ def tokenize_paragraph(paragraph: str) -> list[str]:
     return word_tokens
 
 
-def gen_all_sections(word_tokens: list[str]) -> list[tuple]:
+def gen_all_sections(word_tokens: list[str]) -> list[list[tuple]]:
     # [
     #   (start, end, section)
     #   ...
@@ -48,10 +46,11 @@ def gen_all_sections(word_tokens: list[str]) -> list[tuple]:
     all_sections = []
 
     for i in range(len(word_tokens)):
-        for j in range(1, min(9, len(word_tokens) - i + 1)):
+        section_at_i = []
+        for j in range(1, min(9, len(word_tokens) - i + 1)):  # limit seconds to 8 tokens
             section = ' '.join(word_tokens[i: i + j])
-            all_sections.append((i, i+j, section))
-
+            section_at_i.append((i, i+j, section))
+        all_sections.append(section_at_i)
     return all_sections
 
 
@@ -72,6 +71,10 @@ def identify_section(section: str, sentence: str) -> str:
         truncation=True
     )['input_ids']
 
+    output_ids[:, 0] = 2  # add eos before each sentence
+    # Remove padding (cuts off entity of NOT template but should be fine)
+    output_ids = output_ids[:, :output_ids.shape[1] - 2]
+
     # Run model
     output = model(
         input_ids=input_ids.to(device),
@@ -80,18 +83,18 @@ def identify_section(section: str, sentence: str) -> str:
 
     score = np.ones(num_templates)
     # Skip last 1 token for all templates
-    for i in range(output_ids.shape[1] - 2):
+    for i in range(output_ids.shape[1] - 1):
         logits = output[:, i, :]
         logits = logits.softmax(dim=1)
         logits = logits.to('cpu').numpy()
         for j in range(num_templates):
             # Skip last 2 tokens for all templates but NOT (skip padding)
-            if j == 4 or i < output_ids.shape[1] - 3:
+            if j == 4 or i < output_ids.shape[1]:
                 # Score = product of probability of each word in template
                 # i + 1 to skip first token (padding)
                 score[j] = score[j] * logits[j][int(output_ids[j][i + 1])]
 
-    return entity_types[np.argmax(score)]
+    return entity_types[np.argmax(score)], np.max(score)
 
 
 def entity_list_to_output(entity_list: list[tuple[int, int, str]], sentence_len: int) -> list[str]:
@@ -114,12 +117,20 @@ def run_ner_sentence_tokens(sentence_tokens: list[str]) -> tuple[list[tuple[int,
         #   (start, end, entity_type)
         # ]
         entities_list = []
-        for section in sections:
-            entity = identify_section(section[2], ' '.join(sentence_tokens))
-            if (entity == 'NOT'):
-                continue
+        for i, section_at_i in enumerate(sections):
+            max_score = 0
+            best_entity = 'NOT'
+            best_end = i
+            for section in section_at_i:
+                entity, score = identify_section(
+                    section[2], ' '.join(sentence_tokens))
+                if (max_score < score):
+                    max_score = score
+                    best_entity = entity
+                    best_end = section[1]
 
-            entities_list.append((section[0], section[1], entity))
+            if best_entity != 'NOT':
+                entities_list.append((i, best_end, best_entity))
 
     return entity_list_to_output(entities_list, len(sentence_tokens))
 

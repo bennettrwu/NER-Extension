@@ -31,7 +31,16 @@ def main():
         trues = g.read().replace('\n', ' ').split(' ')
         trues = get_entity_list(trues)
 
-    print(calc_f1(trues, prediction))
+    prec, recall, score = calc_f1(trues, prediction)
+    print('Precision', prec)
+    print('Recall', recall)
+    print('F1 Score', score)
+
+    with open(os.path.join(output_dir, 'f1.txt'), 'w') as f:
+        f.write(f'Precision = {prec}')
+        f.write(f'Recall = {recall}')
+        f.write(f'F1 Score = {score}')
+
 
 def calc_f1(trues, pred):
     nb_correct = len(trues & pred)
@@ -43,7 +52,7 @@ def calc_f1(trues, pred):
 
     score = 2 * p * r / (p + r) if p + r > 0 else 0
 
-    return score
+    return p, r, score
 
 
 def get_entity_list(pred: list[str]) -> list[tuple[int, int, str]]:
