@@ -1,7 +1,12 @@
 import { Readability } from '@mozilla/readability';
 
 const NER_URL = 'http://localhost:8080/ner';
-
+const NER_TYPES_ESCAPES = {
+  Location: '{$}',
+  Person: '{$$}',
+  Organization: '{$$$}',
+  Miscellaneous: '{$$$$}',
+};
 async function main() {
   promptNER();
 }
@@ -86,7 +91,11 @@ async function runNER(e: Element) {
       body: text,
     });
 
-    const to_replace = (await res.json()) as Array<{ str: string; n: number; type: string }>;
+    const to_replace = (await res.json()) as Array<{
+      str: string;
+      n: number;
+      type: 'Location' | 'Person' | 'Organization' | 'Miscellaneous';
+    }>;
     console.log(to_replace);
 
     let updated_element = e.innerHTML;
@@ -95,16 +104,22 @@ async function runNER(e: Element) {
     const escaped_links: Array<string> = [];
     updated_element = updated_element.replace(/<a(?![^>]*\/>)[^>]*>/, (match) => {
       escaped_links.push(match);
-      return '${{ESCAPED_LINK}}';
+      return '{$$$$$$}';
     });
 
     // Label entities
     for (const { str, n, type } of to_replace) {
-      updated_element = replaceNthInstanceOf(updated_element, str, `<span class="named-entity ${type}">${str}</span>`, n);
+      updated_element = replaceNthInstanceOf(updated_element, str, `${NER_TYPES_ESCAPES[type]}${str}{$$$$$}`, n);
+    }
+
+    // Replace escapes with correct <span> tags
+    updated_element = updated_element.replaceAll('{$$$$$}', '</span>');
+    for (const [type, escape] of Object.entries(NER_TYPES_ESCAPES)) {
+      updated_element = updated_element.replaceAll(escape, `<span class="named-entity ${type}">`);
     }
 
     // Restore links
-    updated_element = updated_element.replace('${{ESCAPED_LINK}}', () => {
+    updated_element = updated_element.replaceAll('{$$$$$$}', () => {
       return escaped_links.shift();
     });
 
