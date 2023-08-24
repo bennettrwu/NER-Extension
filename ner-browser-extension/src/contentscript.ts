@@ -10,7 +10,7 @@ async function startNER() {
   showLoadingReader();
   await enableReader();
 
-  const text_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+  const text_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'];
   const page = document.getElementById('ner-container');
   for (const tag of text_tags) {
     const text_element = page.getElementsByTagName(tag);
@@ -73,29 +73,52 @@ async function enableReader() {
 }
 
 async function runNER(e: Element) {
-  const text = e.textContent;
-  if (text === '') return;
+  try {
+    const text = e.textContent;
+    if (text === '') return;
 
-  const res = await fetch(NER_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: text,
-  });
+    console.log(text);
+    const res = await fetch(NER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: text,
+    });
 
-  const to_replace = (await res.json()) as Array<{ str: string; n: number; type: string }>;
+    const to_replace = (await res.json()) as Array<{ str: string; n: number; type: string }>;
+    console.log(to_replace);
 
-  let updated_element = e.innerHTML;
-  for (const { str, n, type } of to_replace) {
-    updated_element = replaceNthInstanceOf(updated_element, str, `<span class="named-entity ${type}">${str}</span>`, n);
+    let updated_element = e.innerHTML;
+
+    // Escape links inside paragraph
+    const escaped_links: Array<string> = [];
+    updated_element = updated_element.replace(/<a(?![^>]*\/>)[^>]*>/, (match) => {
+      escaped_links.push(match);
+      return '${{ESCAPED_LINK}}';
+    });
+
+    // Label entities
+    for (const { str, n, type } of to_replace) {
+      updated_element = replaceNthInstanceOf(updated_element, str, `<span class="named-entity ${type}">${str}</span>`, n);
+    }
+
+    // Restore links
+    updated_element = updated_element.replace('${{ESCAPED_LINK}}', () => {
+      return escaped_links.shift();
+    });
+
+    e.innerHTML = updated_element;
+  } catch (error) {
+    console.log(error);
   }
-  e.innerHTML = updated_element;
 }
 
 function replaceNthInstanceOf(text: string, to_replace: string, replacement: string, n: number) {
   let i = 0;
-  return text.replace(to_replace, (match) => (++i === n ? replacement : match));
+  return text.replace(to_replace, (match) => {
+    return ++i === n ? replacement : match;
+  });
 }
 
 main();

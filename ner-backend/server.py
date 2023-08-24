@@ -7,24 +7,34 @@ entity_map = {
     'LOC': 'Location',
     'PER': 'Person',
     'ORG': 'Organization',
-    'MISC': 'Other'
+    'MISC': 'Miscellaneous'
 }
 
 
 def find_replace_positions(tokens: list[str], labels: list[str]) -> list[dict]:
     entities = []
     word_counts = {}
+
+    entity_words = []
     for token, label in zip(tokens, labels):
-        if word_counts.get(token):
-            word_counts[token] += 1
-        else:
-            word_counts[token] = 1
+        if label != 'O':
+            entity_words.append(token)
+
+    entity_words = set(entity_words)
+
+    for token, label in zip(tokens, labels):
+        for word in entity_words:
+            if word in token:
+                if word_counts.get(word):
+                    word_counts[word] += 1
+                else:
+                    word_counts[word] = 1
 
         if label != 'O':
             entities.append({
                 'str': token,
                 'type': entity_map[label.split('-')[1]],
-                'n': word_counts[token]
+                'n': word_counts[label]
             })
 
     return entities
@@ -42,6 +52,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 def index():
     paragraph = request.data.decode('utf-8')
     tokens, labels = run_ner_paragraph(paragraph)
+
     return json.dumps(find_replace_positions(tokens, labels))
 
 
