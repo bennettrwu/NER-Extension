@@ -4,7 +4,7 @@
     "outDir": "./build/",
     "module": "CommonJS",
     "allowJs": true,
-    "target": "es6",
+    "target": "es2021",
     "declaration": true,
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
