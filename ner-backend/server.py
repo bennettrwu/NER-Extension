@@ -1,5 +1,34 @@
+import json
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
+from inference import run_ner_paragraph
+
+entity_map = {
+    'LOC': 'Location',
+    'PER': 'Person',
+    'ORG': 'Organization',
+    'MISC': 'Other'
+}
+
+
+def find_replace_positions(tokens: list[str], labels: list[str]) -> list[dict]:
+    entities = []
+    word_counts = {}
+    for token, label in zip(tokens, labels):
+        if word_counts.get(token):
+            word_counts[token] += 1
+        else:
+            word_counts[token] = 1
+
+        if label != 'O':
+            entities.append({
+                'str': token,
+                'type': entity_map[label.split('-')[1]],
+                'n': word_counts[token]
+            })
+
+    return entities
+
 
 PORT = 8080
 
@@ -11,13 +40,9 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 @app.route('/ner', methods=['POST'])
 @cross_origin()
 def index():
-    print(request.data.decode('utf-8'))
-    return [
-        {'str': 'Flutter', 'n': 1, 'type': 'Miscellaneous'},
-        {'str': 'iOS', 'n': 1, 'type': 'Miscellaneous'},
-        {'str': 'Engine', 'n': 1, 'type': 'Miscellaneous'},
-        {'str': 'Impeller', 'n': 1, 'type': 'Miscellaneous'},
-    ]
+    paragraph = request.data.decode('utf-8')
+    tokens, labels = run_ner_paragraph(paragraph)
+    return json.dumps(find_replace_positions(tokens, labels))
 
 
 if __name__ == '__main__':
