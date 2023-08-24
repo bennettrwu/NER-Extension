@@ -37,9 +37,9 @@ def main():
     print('F1 Score', score)
 
     with open(os.path.join(output_dir, 'f1.txt'), 'w') as f:
-        f.write(f'Precision = {prec}')
-        f.write(f'Recall = {recall}')
-        f.write(f'F1 Score = {score}')
+        f.write(f'Precision = {prec}\n')
+        f.write(f'Recall = {recall}\n')
+        f.write(f'F1 Score = {score}\n')
 
 
 def calc_f1(trues, pred):
