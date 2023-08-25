@@ -28,10 +28,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # Load pretrained bart model and tokenizer
-model = 'facebook/bart-large'
-print(f'Loading {model} model...')
-model = BartForConditionalGeneration.from_pretrained(model)
-tokenizer = BartTokenizer.from_pretrained(model)
+model_name = 'facebook/bart-large'
+print(f'Loading {model_name} model...')
+model = BartForConditionalGeneration.from_pretrained(model_name)
+tokenizer = BartTokenizer.from_pretrained(model_name)
 model.to(device)
 print('Loaded!')
 
@@ -101,12 +101,12 @@ print('Validation dataset ready!')
 
 
 optimizer = AdamW([{
-    "params": [
+    'params': [
         p
         for n, p in model.named_parameters()
         if not any(nd in n for nd in ['bias', 'LayerNorm.weight'])
     ],
-    "weight_decay": 0.0,
+    'weight_decay': 0.0,
 }], lr=learning_rate, eps=adam_epsilon)
 
 total_steps = epochs * len(train_dataloader)
@@ -193,8 +193,6 @@ def validate_model(model: BartForConditionalGeneration, validation_dataloader: D
 
     avg_loss = total_loss / batchs_count
     accuracy = correct / output_count
-    print(f'Validation Loss: {avg_loss}')
-    print(f'Validation Accuracy: {accuracy}')
     return avg_loss, accuracy
 
 
@@ -203,6 +201,8 @@ for epoch in range(epochs):
     print(f'\nEpoch: {epoch} of {epochs}')
     train_loop(model, train_dataloader, optimizer, scheduler, scaler)
     avg_loss, accuracy = validate_model(model, validation_dataloader)
+    print(f'Validation Loss: {avg_loss}')
+    print(f'Validation Accuracy: {accuracy}')
 
     # Save model with best accuracy
     if accuracy > best_accuracy:
@@ -212,9 +212,12 @@ for epoch in range(epochs):
         tokenizer.save_pretrained(best_model_save_dir)
         torch.save(
             optimizer.state_dict(),
-            os.path.join(best_model_save_dir, "optimizer.pt")
+            os.path.join(best_model_save_dir, 'optimizer.pt')
         )
         torch.save(
             scheduler.state_dict(),
-            os.path.join(best_model_save_dir, "scheduler.pt")
+            os.path.join(best_model_save_dir, 'scheduler.pt')
         )
+        with open(os.path.join(best_model_save_dir, 'validation_results.txt'), 'w') as f:
+            f.write(f'Validation Loss: {avg_loss}\n')
+            f.write(f'Validation Accuracy: {accuracy}\n')
