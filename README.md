@@ -1,6 +1,6 @@
 # Named Entity Recogntition Extension
 
-An implementation of the NER model described in <i>Template-Based Named Entity Recognition Using BART</i> (Cui, Leyang et al., 2021) as well as a NER Chrome browser extension and server.
+An implementation of the NER model described in <i>Template-Based Named Entity Recognition Using BART</i> (Cui, Leyang et al., 2021) as well as a NER Chrome browser extension and server to highlight named entities on webpages.
 
 ## Getting Started
 
