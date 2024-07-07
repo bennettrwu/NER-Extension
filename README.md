@@ -1,10 +1,16 @@
 # Named Entity Recogntition Extension
 
-An implementation of the NER model described in <i>Template-Based Named Entity Recognition Using BART</i> (Cui, Leyang et al., 2021) as well as a NER Chrome browser extension and server to highlight named entities on webpages.
-
 ## About
 
-Built with Python, PyTorch, Node.js, Typescript, and Javascript.
+An implementation of the NER model described in <i>Template-Based Named Entity Recognition Using BART</i> (Cui, Leyang et al., 2021) as well as a NER Chrome browser extension and server to highlight named entities on webpages.
+
+## Built With
+
+* Python
+* PyTorch
+* Node.js
+* Typescript
+* Javascript
 
 ## Getting Started
 
