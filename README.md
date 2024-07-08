@@ -127,8 +127,8 @@ With the server running and extension installed in Chrome:
 
 1. Open a webpage
 
-2. Click `Run` when NER prompt popups up
+2. Click `Run` when NER prompt popup shows up
 
 3. Wait for labels to be generated. See console for errors if they don't show up.
 
-    * Keep in mind this might take a significant amount of time to label the entire page
+    * Note: it might take a significant amount of time to label the entire page depending on your computer's capabilities
