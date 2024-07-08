@@ -121,7 +121,7 @@ Steps 1-2 are optional but recommended to avoid package conficts
     The server will now be listening on `localhost:8080`
 
 
-## Usage 
+### Using the Extension 
 
 With the server running and extension installed in Chrome:
 
